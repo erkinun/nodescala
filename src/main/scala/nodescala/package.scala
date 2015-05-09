@@ -95,7 +95,7 @@ package object nodescala {
      *  However, it is also non-deterministic -- it may throw or return a value
      *  depending on the current state of the `Future`.
      */
-    def now: T = ???
+    def now: T = Await.result(f, 0 seconds)
 
     /** Continues the computation of this future by taking the current future
      *  and mapping it into another future.
@@ -103,7 +103,12 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continueWith[S](cont: Future[T] => S): Future[S] = ???
+    def continueWith[S](cont: Future[T] => S): Future[S] = f.flatMap { ft =>
+      val fs = Future.successful(ft)
+      val s = cont(fs)
+
+      Future(s)
+    }
 
     /** Continues the computation of this future by taking the result
      *  of the current future and mapping it into another future.
@@ -111,8 +116,10 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continue[S](cont: Try[T] => S): Future[S] = ???
-
+    def continue[S](cont: Try[T] => S): Future[S] = f.flatMap{ ft =>
+      val s = cont(Success(ft))
+      Future(s)
+    }
   }
 
   /** Subscription objects are used to be able to unsubscribe
