@@ -1,3 +1,5 @@
+import java.util.NoSuchElementException
+
 import scala.language.postfixOps
 import scala.io.StdIn
 import scala.util._
@@ -112,7 +114,12 @@ package object nodescala {
      *  However, it is also non-deterministic -- it may throw or return a value
      *  depending on the current state of the `Future`.
      */
-    def now: T = Await.result(f, 0 seconds)
+    def now: T = try {
+      Await.result(f, 0 seconds)
+    }
+    catch {
+      case _ : Exception => throw new NoSuchElementException()
+    }
 
     /** Continues the computation of this future by taking the current future
      *  and mapping it into another future.

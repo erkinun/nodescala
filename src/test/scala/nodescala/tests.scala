@@ -105,7 +105,7 @@ class NodeScalaSuite extends FunSuite {
       assert(false)
     }
     catch {
-      case _: Exception => //ok
+      case _: NoSuchElementException => //ok
     }
   }
 
