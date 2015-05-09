@@ -88,7 +88,27 @@ class NodeScalaSuite extends FunSuite {
       case t: TimeoutException => // ok!
     }
   }
-  
+
+  test("Future always can return now") {
+    val f = Future.always(1)
+
+    val res = f.now
+
+    assert(res == 1)
+  }
+
+  test("Future never can not return from now") {
+    val f = Future.never
+
+    try{
+      val res = f.now
+      assert(false)
+    }
+    catch {
+      case _: Exception => //ok
+    }
+  }
+
   class DummyExchange(val request: Request) extends Exchange {
     @volatile var response = ""
     val loaded = Promise[String]()
