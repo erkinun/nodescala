@@ -54,9 +54,12 @@ trait NodeScala {
     val reqSub = Future.run() { token =>
       Future{
         while (token.nonCancelled) {
-          listener.nextRequest() flatMap { ftReqEx =>
-            Future(respond(ftReqEx._2, token, handler(ftReqEx._1)))
+          listener nextRequest() foreach { reqEx =>
+            respond(reqEx._2, token, handler(reqEx._1))
           }
+          //listener.nextRequest() flatMap { ftReqEx =>
+          //  Future(respond(ftReqEx._2, token, handler(ftReqEx._1)))
+          //}
         }
       }
     }
