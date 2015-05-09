@@ -48,14 +48,46 @@ class NodeScalaSuite extends FunSuite {
     val f1 = Future.always(1)
     val fNever = Future.never
 
-    Future.any(List(f1, fNever)) onComplete{ ftry =>
-      ftry match {
-        case Success(v) => assert(v == 1)
-        case _ => assert(false)
-      }
+    Future.any(List(f1, fNever)) onComplete {
+      case Success(v) => assert(v == 1)
+      case _ => assert(false)
     }
   }
 
+  test("Future delays must be handled") {
+    val delay = Future.delay(1 seconds)
+
+    Await.ready(delay, 3 seconds)
+  }
+
+  test("A Future should not complete after 2s when using a delay of 5s") {
+    try {
+      val p = Future.delay(5 second)
+      val z = Await.ready(p, 2 second) // block for future to complete
+      assert(false)
+    } catch {
+      case _: TimeoutException => // Ok!
+    }
+  }
+
+  test("A Future should not complete after 1s when using a delay of 3s") {
+    val p = Promise[Unit]()
+
+    Future {
+      blocking {
+        Future.delay(3 second) onSuccess {
+          case _ => p.complete(Try(()))
+        }
+      }
+    }
+
+    try {
+      Await.result(p.future, 1 second)
+      assert(false)
+    } catch {
+      case t: TimeoutException => // ok!
+    }
+  }
   
   class DummyExchange(val request: Request) extends Exchange {
     @volatile var response = ""
