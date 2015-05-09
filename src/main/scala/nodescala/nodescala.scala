@@ -52,14 +52,10 @@ trait NodeScala {
     val subscription = listener.start()
 
     val reqSub = Future.run() { token =>
-      Future{
+      async {
         while (token.nonCancelled) {
-          listener nextRequest() foreach { reqEx =>
-            respond(reqEx._2, token, handler(reqEx._1))
-          }
-          //listener.nextRequest() flatMap { ftReqEx =>
-          //  Future(respond(ftReqEx._2, token, handler(ftReqEx._1)))
-          //}
+          val req = await(listener nextRequest())
+          respond(req._2, token, handler(req._1))
         }
       }
     }
