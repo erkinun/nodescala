@@ -31,6 +31,18 @@ class NodeScalaSuite extends FunSuite {
     }
   }
 
+  test("Future all must return all") {
+    val f1 = Future.always(1)
+    val f2 = Future.always(2)
+
+    val list = Future.all(List(f1,f2))
+
+    val listRes = Await.result(list, 1 seconds)
+    val listExpected = List(1,2)
+
+    assert(listRes.size == 2)
+    assert(listRes.equals(listExpected))
+  }
   
   
   class DummyExchange(val request: Request) extends Exchange {
