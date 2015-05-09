@@ -88,7 +88,7 @@ package object nodescala {
       val src = CancellationTokenSource()
       val fut = f(src.cancellationToken)
 
-      fut onComplete { fu => src.p.tryComplete(fu) }
+      //fut onComplete { fu => src.p.tryComplete(fu) }
 
       src
     }
