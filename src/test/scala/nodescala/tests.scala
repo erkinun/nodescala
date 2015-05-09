@@ -43,7 +43,19 @@ class NodeScalaSuite extends FunSuite {
     assert(listRes.size == 2)
     assert(listRes.equals(listExpected))
   }
-  
+
+  test("Future any can return the first finished") {
+    val f1 = Future.always(1)
+    val fNever = Future.never
+
+    Future.any(List(f1, fNever)) onComplete{ ftry =>
+      ftry match {
+        case Success(v) => assert(v == 1)
+        case _ => assert(false)
+      }
+    }
+  }
+
   
   class DummyExchange(val request: Request) extends Exchange {
     @volatile var response = ""
